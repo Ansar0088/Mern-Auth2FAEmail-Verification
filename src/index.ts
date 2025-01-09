@@ -1,40 +1,47 @@
-import cookieParser from "cookie-parser";
 import "dotenv/config";
 import cors from "cors";
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
+import cookieParser from "cookie-parser";
 import { config } from "./config/app.config";
 import connectDatabase from "./database/database";
 import { errorHandler } from "./middlewares/errorHandler";
 import { HTTPSTATUS } from "./config/http.config";
 import { asyncHandler } from "./middlewares/asyncHandler";
-import authRouter from "./modules/auth/auth.routes";
+import authRoutes from "./modules/auth/auth.routes";
+import dotenv from 'dotenv';
+
+
 
 const app = express();
-const BASE_PATH=config.BASE_PATH;
+const BASE_PATH = config.BASE_PATH;
+dotenv.config();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.use(cors({ 
-    credentials: true,
+app.use(
+  cors({
     origin: config.APP_ORIGIN,
-}));
+    credentials: true,
+  })
+);
 
 app.use(cookieParser());
 
-app.get('/', asyncHandler(async (req, res) => {
+app.get(
+  "/",
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     res.status(HTTPSTATUS.OK).json({
-        message: "hello subscribers!!"
+      message: "Hello Subscribers!!!",
     });
-}));
+  })
+);
+console.log("MONGO_URI:----------", process.env.MONGO_URI);
 
-app.use(`${BASE_PATH}/auth`,authRouter)
+app.use(`${BASE_PATH}/auth`, authRoutes);
+
 app.use(errorHandler);
 
 app.listen(config.PORT, async () => {
-    console.log(`Server listening on port ${config.PORT} in ${config.NODE_ENV}`);
-    await connectDatabase();
+  console.log(`Server listening on port ${config.PORT} in ${config.NODE_ENV}`);
+  await connectDatabase();
 });
-function async(req: any, res: any): (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<any> {
-    throw new Error("Function not implemented.");
-}
-
