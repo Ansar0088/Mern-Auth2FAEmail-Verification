@@ -31,5 +31,5 @@ const sessionSchema = new Schema<SessionDocument>({
 });
 
 
-const sessionModal=mongoose.model<SessionDocument>("Session",sessionSchema);
+const   sessionModal=mongoose.model<SessionDocument>("Session",sessionSchema);
 export default sessionModal;

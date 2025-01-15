@@ -10,7 +10,9 @@ import { asyncHandler } from "./middlewares/asyncHandler";
 import authRoutes from "./modules/auth/auth.routes";
 import dotenv from 'dotenv';
 
-
+import passport from "./middlewares/passport"
+import sessionRoutes from "./modules/session/sessions.routes";
+import { authenticateJWT } from "./common/strategies/jwt.strategy";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
@@ -26,9 +28,11 @@ app.use(
 );
 
 app.use(cookieParser());
+app.use(passport.initialize());
+
 
 app.get(
-  "/",
+  "/",  
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     res.status(HTTPSTATUS.OK).json({
       message: "Hello Subscribers!!!",
@@ -38,6 +42,7 @@ app.get(
 console.log("MONGO_URI:----------", process.env.MONGO_URI);
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
+app.use(`${BASE_PATH}/session`,authenticateJWT, sessionRoutes);
 
 app.use(errorHandler);
 
